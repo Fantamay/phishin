@@ -1,0 +1,64 @@
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    margin:0;
+}
+
+.header{
+    background:#000091;
+    color:white;
+    padding:15px;
+}
+
+.logo{
+    margin-left:20px;
+}
+
+.container{
+    background:white;
+    width:450px;
+    margin:80px auto;
+    padding:40px;
+    text-align:center;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.providers{
+    margin-top:30px;
+}
+
+.provider{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:5px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.impots{
+    background:#2c7be5;
+    color:white;
+}
+
+.ameli{
+    background:#0072ce;
+    color:white;
+}
+
+.laposte{
+    background:#ffcc00;
+}
+
+.franceid{
+    background:#333;
+    color:white;
+}
+
+footer{
+    text-align:center;
+    margin-top:40px;
+    color:#666;
+}
