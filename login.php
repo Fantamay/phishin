@@ -1,16 +1,13 @@
 <?php
-// Connexion à la base de données
-$host = getenv('mysql.railway.internal');
-$dbname = getenv('railway');
-$user = getenv('root');
-$password = getenv('HSBjlCxCOPMkjQMmChUFHQoVRdbtYcma');       // Par défaut sous XAMPP
+// Connexion à la base de données Railway
+$host = getenv('MYSQLHOST');
+$db   = getenv('MYSQLDATABASE');
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+$port = getenv('MYSQLPORT');
 $charset = 'utf8mb4';
-$conn = new mysqli($host, $user, $password, $dbname);
 
-if ($conn->connect_error) {
-    die("Erreur de connexion : " . $conn->connect_error);
-}
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
