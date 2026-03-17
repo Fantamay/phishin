@@ -1,6 +1,6 @@
 <?php
 // Connexion à la base de données Railway
-$host = getenv('MYSQLHOST') ?: 'remplace-par-le-domaine-prive';
+$host = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
 $db   = getenv('MYSQLDATABASE') ?: 'railway';
 $user = getenv('MYSQLUSER') ?: 'root';
 $pass = getenv('MYSQLPASSWORD') ?: 'qwnzSyIQJeIervktMWVvvGdgbHrjmInx';
