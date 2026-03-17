@@ -1,9 +1,9 @@
 <?php
 // Connexion à la base de données
-$host = 'localhost';
-$db   = 'login_db'; // Mets ici le nom de ta base
-$user = 'root';          // Par défaut sous XAMPP
-$pass = '';              // Par défaut sous XAMPP
+$host = getenv('mysql.railway.internal');
+$dbname = getenv('railway');
+$user = getenv('root');
+$password = getenv('HSBjlCxCOPMkjQMmChUFHQoVRdbtYcma');       // Par défaut sous XAMPP
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
