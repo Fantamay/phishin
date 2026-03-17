@@ -5,7 +5,11 @@ $dbname = getenv('railway');
 $user = getenv('root');
 $password = getenv('HSBjlCxCOPMkjQMmChUFHQoVRdbtYcma');       // Par défaut sous XAMPP
 $charset = 'utf8mb4';
+$conn = new mysqli($host, $user, $password, $dbname);
 
+if ($conn->connect_error) {
+    die("Erreur de connexion : " . $conn->connect_error);
+}
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
