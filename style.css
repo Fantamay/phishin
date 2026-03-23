@@ -62,3 +62,73 @@ footer{
     margin-top:40px;
     color:#666;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  body, html {
+    font-size: 16px;
+  }
+  .container, .main-content, .form-section {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  nav, header, footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  table {
+    font-size: 14px;
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+  /* Add more responsive rules as needed */
+}
+
+.portrait-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    margin-top: 30px;
+}
+
+.portrait-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    width: 320px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 18px;
+    transition: box-shadow 0.2s;
+}
+
+.portrait-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+
+.portrait-content {
+    width: 100%;
+    font-size: 1.1em;
+    color: #222;
+    line-height: 1.7;
+    word-break: break-all;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .portrait-list {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .portrait-card {
+        width: 100%;
+        min-width: unset;
+        padding: 16px 10px;
+    }
+}

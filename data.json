@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "username": "admin",
+        "password": "admin123",
+        "email": "admin@email.com",
+        "created_at": "2026-03-23 09:40:29"
+    },
+    {
+        "id": 2,
+        "username": "aguiboutangara94@gmail.com",
+        "password": "F@nt@2006",
+        "email": "aguiboutangara94@gmail.com",
+        "identifiant": "",
+        "created_at": "2026-03-23 10:51:36"
+    }
+]
